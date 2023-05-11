@@ -53,7 +53,12 @@ export async function createDeck({
     skipDuplicates: true,
   })
 
-  const allCards = await prisma.card.findMany()
+  //const allCards = await prisma.card.findMany()
+  const allCards = await prisma.card.findMany({
+    where: {
+      uuid: { in: cards.map((card) => card.uuid) },
+    },
+  })
 
   const newDeck = prisma.deck.create({
     data: {

@@ -5,11 +5,7 @@ export async function listDecks({
   name = '',
   description = '',
   idAuthor = '',
-}: Partial<{
-  name: string
-  description: string
-  idAuthor: string
-}>) {
+}: DB.DeckQuery) {
   const prisma = new PrismaClient()
   const decks = prisma.deck.findMany({
     where: {
@@ -26,6 +22,7 @@ export async function listDecks({
           count: true,
         },
       },
+      author: true,
     },
   })
   return decks
@@ -53,7 +50,6 @@ export async function createDeck({
     skipDuplicates: true,
   })
 
-  //const allCards = await prisma.card.findMany()
   const allCards = await prisma.card.findMany({
     where: {
       uuid: { in: cards.map((card) => card.uuid) },
@@ -80,24 +76,26 @@ export async function createDeck({
         },
       },
     },
+    select: {
+      description: true,
+      name: true,
+      id: true,
+      author: true,
+    },
   })
+
   return newDeck
 }
 // DeckCreation = Omit<NonNullable<Prisma.DeckSelect>, 'id'>
 // type Data = Awaited<ReturnType<typeof getCards>>
 export default async function handler(
   req: NextApiRequest,
-  //res: NextApiResponse<Data>
-  res: NextApiResponse
+  res: NextApiResponse<DB.Deck | DB.DeckWithCards[]>
 ) {
   switch (req.method) {
     case 'GET':
-      const fields: Partial<{
-        name: string
-        description: string
-        idAuthor: string
-      }> = req.query
-      const decks = await listDecks(fields)
+      const criteria: DB.DeckQuery = req.query
+      const decks = await listDecks(criteria)
       return res.status(200).json(decks)
     case 'POST':
       const rawData = req.body

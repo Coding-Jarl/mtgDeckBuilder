@@ -56,18 +56,6 @@ export async function createDeck({
     },
   })
 
-  // const upsertUser = await prisma.user.upsert({
-  //   where: {
-  //     email: 'viola@prisma.io',
-  //   },
-  //   update: {
-  //     name: 'Viola the Magnificent',
-  //   },
-  //   create: {
-  //     email: 'viola@prisma.io',
-  //     name: 'Viola the Magnificent',
-  //   },
-
   const newDeck = prisma.deck.create({
     data: {
       description: description,

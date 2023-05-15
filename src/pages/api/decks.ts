@@ -50,11 +50,23 @@ export async function createDeck({
     skipDuplicates: true,
   })
 
-  const allCards = await prisma.card.findMany({
+  const usedCards = await prisma.card.findMany({
     where: {
       uuid: { in: cards.map((card) => card.uuid) },
     },
   })
+
+  // const upsertUser = await prisma.user.upsert({
+  //   where: {
+  //     email: 'viola@prisma.io',
+  //   },
+  //   update: {
+  //     name: 'Viola the Magnificent',
+  //   },
+  //   create: {
+  //     email: 'viola@prisma.io',
+  //     name: 'Viola the Magnificent',
+  //   },
 
   const newDeck = prisma.deck.create({
     data: {
@@ -69,7 +81,7 @@ export async function createDeck({
         createMany: {
           data: cards.map((card) => ({
             count: card.count,
-            idCard: allCards.find((candidate) => candidate.uuid === card.uuid)
+            idCard: usedCards.find((candidate) => candidate.uuid === card.uuid)
               ?.id as number,
           })),
           skipDuplicates: true,
@@ -86,11 +98,10 @@ export async function createDeck({
 
   return newDeck
 }
-// DeckCreation = Omit<NonNullable<Prisma.DeckSelect>, 'id'>
 // type Data = Awaited<ReturnType<typeof getCards>>
 export default async function handler(
   req: NextApiRequest,
-  res: NextApiResponse<DB.Deck | DB.DeckWithCards[]>
+  res: NextApiResponse
 ) {
   switch (req.method) {
     case 'GET':
@@ -99,7 +110,10 @@ export default async function handler(
       return res.status(200).json(decks)
     case 'POST':
       const rawData = req.body
-      const newDeck = await createDeck(rawData)
+      const newDeck = await createDeck(rawData).catch((err: Error) => {
+        console.warn(err)
+        return res.status(409).end()
+      })
       return res.status(201).json(newDeck)
     default:
       return res.status(405).end()

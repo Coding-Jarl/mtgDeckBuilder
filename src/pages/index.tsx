@@ -5,6 +5,8 @@ import Card from '@/components/card'
 import axios from 'axios'
 import { store } from '@/lib/redux/store'
 import { Provider } from 'react-redux'
+import { ToastContainer } from 'react-toastify'
+import 'react-toastify/dist/ReactToastify.min.css'
 
 const siteTitle = 'MtgDeckBuilder - Home'
 
@@ -37,6 +39,7 @@ export default function Home({ cards }: Props) {
           ))}
         </Gallery>
       </Layout>
+      <ToastContainer />
     </Provider>
   )
 }

@@ -90,7 +90,7 @@ export async function createDeck({
 // type Data = Awaited<ReturnType<typeof getCards>>
 export default async function handler(
   req: NextApiRequest,
-  res: NextApiResponse<DB.Deck | DB.DecksWithCards>
+  res: NextApiResponse<DB.Deck | DB.DeckWithCards[]>
 ) {
   switch (req.method) {
     case 'GET':

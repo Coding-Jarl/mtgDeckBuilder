@@ -3,7 +3,6 @@ import { Prisma } from '@prisma/client'
 declare global {
   namespace DB {
     type Deck = Omit<Prisma.DeckGetPayload<object>, 'idAuthor'>
-    type Decks = Array<Deck>
     type DeckQuery = Partial<{
       name: string
       description: string
@@ -13,7 +12,6 @@ declare global {
     type CardInDeck = Prisma.CardInDeckGetPayload<object>
 
     type Card = Prisma.CardGetPayload<object>
-    type Cards = Array<Card>
 
     type CardWithDecks = Prisma.CardGetPayload<{
       include: {
@@ -25,7 +23,6 @@ declare global {
         }
       }
     }>
-    type CardsWithDecks = Array<CardWithDecks>
 
     type DeckWithCards = Prisma.DeckGetPayload<{
       include: {
@@ -37,6 +34,5 @@ declare global {
         }
       }
     }>
-    type DecksWithCards = Array<DeckWithCards>
   }
 }

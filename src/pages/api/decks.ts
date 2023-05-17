@@ -89,7 +89,7 @@ export async function createDeck({
 // type Data = Awaited<ReturnType<typeof getCards>>
 export default async function handler(
   req: NextApiRequest,
-  res: NextApiResponse
+  res: NextApiResponse<DB.Deck | DB.DeckWithCards[]>
 ) {
   switch (req.method) {
     case 'GET':
@@ -98,11 +98,13 @@ export default async function handler(
       return res.status(200).json(decks)
     case 'POST':
       const rawData = req.body
-      const newDeck = await createDeck(rawData).catch((err: Error) => {
+      try {
+        const newDeck = await createDeck(rawData)
+        return res.status(201).json(newDeck)
+      } catch (err) {
         console.warn(err)
         return res.status(409).end()
-      })
-      return res.status(201).json(newDeck)
+      }
     default:
       return res.status(405).end()
   }
